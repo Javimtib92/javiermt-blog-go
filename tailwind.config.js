@@ -1,0 +1,82 @@
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  darkMode: "class",
+  // These paths are just examples, customize them to match your project structure
+  content: ["./web/templates/*.{html,tmpl}"],
+  theme: {
+    fontFamily: {
+      display: ["var(--font-display)"],
+      body: ["var(--font-body)"],
+      mono: ["var(--font-mono)"],
+    },
+    extend: {
+      backgroundImage: {
+        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
+        "gradient-conic":
+          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+      },
+      colors: {
+        background: {
+          50: "color-mix(in srgb, var(--color-background-base) 20%, white)",
+          100: "color-mix(in srgb, var(--color-background-base) 50%, white)",
+          200: "color-mix(in srgb, var(--color-background-base) 70%, white)",
+          300: "color-mix(in srgb, var(--color-background-base) 80%, white)",
+          400: "color-mix(in srgb, var(--color-background-base) 90%, white)",
+          500: "var(--color-background-base)",
+          600: "color-mix(in srgb, var(--color-background-base), black 10%)",
+          700: "color-mix(in srgb, var(--color-background-base), black 30%)",
+          800: "color-mix(in srgb, var(--color-background-base), black 50%)",
+          900: "color-mix(in srgb, var(--color-background-base), black 70%)",
+        },
+        primary: {
+          50: "color-mix(in srgb, var(--color-primary-base) 5%, white)",
+          100: "color-mix(in srgb, var(--color-primary-base) 10%, white)",
+          200: "color-mix(in srgb, var(--color-primary-base) 30%, white)",
+          300: "color-mix(in srgb, var(--color-primary-base) 50%, white)",
+          400: "color-mix(in srgb, var(--color-primary-base) 70%, white)",
+          500: "var(--color-primary-base)",
+          600: "color-mix(in srgb, var(--color-primary-base), black 10%)",
+          700: "color-mix(in srgb, var(--color-primary-base), black 30%)",
+          800: "color-mix(in srgb, var(--color-primary-base), black 50%)",
+          900: "color-mix(in srgb, var(--color-primary-base), black 70%)",
+        },
+        secondary: {
+          50: "color-mix(in srgb, var(--color-secondary-base) 5%, white)",
+          100: "color-mix(in srgb, var(--color-secondary-base) 10%, white)",
+          200: "color-mix(in srgb, var(--color-secondary-base) 30%, white)",
+          300: "color-mix(in srgb, var(--color-secondary-base) 50%, white)",
+          400: "color-mix(in srgb, var(--color-secondary-base) 70%, white)",
+          500: "var(--color-secondary-base)",
+          600: "color-mix(in srgb, var(--color-secondary-base), black 10%)",
+          700: "color-mix(in srgb, var(--color-secondary-base), black 30%)",
+          800: "color-mix(in srgb, var(--color-secondary-base), black 50%)",
+          900: "color-mix(in srgb, var(--color-secondary-base), black 70%)",
+        },
+        accent: {
+          50: "color-mix(in srgb, var(--color-accent-base) 5%, white)",
+          100: "color-mix(in srgb, var(--color-accent-base) 10%, white)",
+          200: "color-mix(in srgb, var(--color-accent-base) 30%, white)",
+          300: "color-mix(in srgb, var(--color-accent-base) 50%, white)",
+          400: "color-mix(in srgb, var(--color-accent-base) 70%, white)",
+          500: "var(--color-accent-base)",
+          600: "color-mix(in srgb, var(--color-accent-base), black 10%)",
+          700: "color-mix(in srgb, var(--color-accent-base), black 30%)",
+          800: "color-mix(in srgb, var(--color-accent-base), black 50%)",
+          900: "color-mix(in srgb, var(--color-accent-base), black 70%)",
+        },
+        "accent-secondary": {
+          50: "color-mix(in srgb, var(--color-accent-secondary-base) 5%, white)",
+          100: "color-mix(in srgb, var(--color-accent-secondary-base) 10%, white)",
+          200: "color-mix(in srgb, var(--color-accent-secondary-base) 30%, white)",
+          300: "color-mix(in srgb, var(--color-accent-secondary-base) 50%, white)",
+          400: "color-mix(in srgb, var(--color-accent-secondary-base) 70%, white)",
+          500: "var(--color-accent-secondary-base)",
+          600: "color-mix(in srgb, var(--color-accent-secondary-base), black 10%)",
+          700: "color-mix(in srgb, var(--color-accent-secondary-base), black 30%)",
+          800: "color-mix(in srgb, var(--color-accent-secondary-base), black 50%)",
+          900: "color-mix(in srgb, var(--color-accent-secondary-base), black 70%)",
+        },
+      },
+    },
+  },
+};

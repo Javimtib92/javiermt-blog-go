@@ -1,0 +1,236 @@
+<html lang="en" class="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Coding Kittens</title>
+    <link
+      rel="preload"
+      href="/fonts/BarlowCondensed/BarlowCondensed-Regular.woff2"
+      as="font"
+      type="font/woff2"
+    />
+    <link
+      rel="preload"
+      href="/fonts/BarlowCondensed/BarlowCondensed-Bold.woff2"
+      as="font"
+      type="font/woff2"
+    />
+    <link
+      rel="preload"
+      href="/fonts/Montserrat/Montserrat-Regular.woff2"
+      as="font"
+      type="font/woff2"
+    />
+    <link
+      rel="preload"
+      href="/fonts/Montserrat/Montserrat-Medium.woff2"
+      as="font"
+      type="font/woff2"
+    />
+    <link
+      rel="preload"
+      href="/fonts/Montserrat/Montserrat-Bold.woff2"
+      as="font"
+      type="font/woff2"
+    />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <script
+      src="https://unpkg.com/htmx.org@1.9.10"
+      integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body
+    class="bg-white text-black antialiased transition-colors dark:bg-background-700 dark:text-white"
+  >
+    <div class="mb-40 max-w-3xl md:mx-auto">
+      <main class="flex min-w-0 flex-auto flex-col px-2 md:px-0">
+        <nav
+          class="navbar sticky top-0 z-10 mb-12 mt-20 flex flex-row items-start py-4 pl-2 pr-4 md:-mx-[28px] md:px-5"
+        >
+          <!-- <MobileNavMenu></MobileNavMenu> -->
+
+          <div
+            class="backdrop absolute left-[-8px] right-[-8px] top-0 h-20 min-w-full backdrop-blur md:-mx-[28px]"
+          ></div>
+
+          <div
+            class="img-container z-10 flex min-w-full flex-row justify-between space-x-0"
+          >
+            <a href="/" class="flex flex-row items-center">
+              <img
+                alt="text"
+                fetchpriority="high"
+                width="48"
+                height="48"
+                decoding="async"
+                class="mr-4"
+                style="color: transparent"
+                src="/assets/logo.png"
+              />
+              <div className="flex flex-col">
+                <p
+                  className="m-0 font-display text-2xl font-bold text-primary-600 dark:text-2xl dark:text-primary-100 sm:text-2xl sm:dark:text-2xl"
+                >
+                  Coding Kittens
+                </p>
+                <p className="prose subtle m-0" subtle>
+                  Curiosity Didn&apos;t Kill The Cat
+                </p>
+              </div>
+            </a>
+
+            <div class="flex flex-row-reverse gap-6 sm:flex-row">
+              <!-- <NavigationLinks />
+              <ThemeProvider>
+                <PreferredThemeSwitch></PreferredThemeSwitch>
+              </ThemeProvider> -->
+            </div>
+          </div>
+        </nav>
+        <div class="mx-4 md:mx-0">
+          <div>
+            <div class="mb-6 flex flex-row items-center gap-6">
+              <span
+                class="box-border flex h-20 w-20 items-center justify-center overflow-hidden rounded-full align-middle outline-none ring-2 ring-background-50 ring-slate-500 ring-offset-2 ring-offset-accent-secondary-300 dark:ring-background-500 dark:ring-offset-accent-secondary-500"
+              >
+                <img
+                  alt="text"
+                  fetchpriority="high"
+                  width="126"
+                  height="158"
+                  decoding="async"
+                  data-nimg="1"
+                  class="flex h-full w-full object-cover"
+                  style="color: transparent"
+                  src="/assets/me.jpeg"
+                />
+              </span>
+
+              <div class="flex flex-col place-self-start">
+                <h1
+                  class="font-display font-bold text-primary-600 dark:text-primary-100 text-3xl leading-7 sm:text-4xl"
+                >
+                  Javier Muñoz Tous
+                </h1>
+                <h2
+                  class="font-display text-2xl font-bold italic text-accent-500 underline underline-offset-8 dark:text-accent-400 sm:text-xl"
+                >
+                  Full Stack Engineer
+                </h2>
+              </div>
+            </div>
+            <p class="prose">
+              <mark
+                class="text-primary-900 dark:text-primary-100"
+                style="--highlighted: 0"
+              >
+                <b
+                  class="font-display text-2xl text-primary-600 dark:text-primary-100"
+                >
+                  Hola 👋, Welcome to Coding Kittens!
+                </b>
+              </mark>
+            </p>
+            <p class="prose">
+              I&apos;m Javier Muñoz Tous and this is my own personal blog built
+              with the simple intention of creating tutorials, sharing my
+              thoughts, experimenting with new tools, having fun, and being
+              somehow helpful to our tech community.
+            </p>
+            <p class="prose">
+              I&apos;m a Fullstack Software Engineer with over{' '}
+              {getYearDiff(new Date('2015-05-01'), new Date())} years of
+              experience. I&apos;m currently specialized in JavaScript, but
+              I&apos;m a man of the world and I can “speak” many languages.
+            </p>
+            <p class="prose">
+              <mark
+                class="text-primary-900 dark:text-primary-100"
+                style="--highlighted: 0"
+              >
+                Coding Kittens&apos;s name idea came from my two adorable cats —
+                Loki and Nym — </mark
+              >{' '} who have been with me a lot of my coding time. One could
+              say they code for me and I just watch them. 🤫 My fiance came up
+              with the name idea, she is my most profound inspiration and a huge
+              source of support. 🧡🖤
+            </p>
+            <p class="prose">
+              I like simple things, I practice Yoga twice a week 🧘‍♂️ I’m
+              passionate about video-games 🎮 I&apos;m a Manga and Anime
+              &quot;Otaku&quot; ⛩️ and my favorite meal is ramen 🍜
+            </p>
+            <p class="prose">
+              If you want to know me a bit better you can find me on Instagram.
+              I warn you, though, that every now and then I post stories of my
+              cats doing something tremendously silly.
+            </p>
+            <p class="prose">
+              If my professional career is what interests you, you can check my
+              LinkedIn or Github profiles.
+            </p>
+            <p class="prose">
+              I hope you find some calm and insight in this little space
+              I&apos;ve built.
+            </p>
+
+            <p class="prose">Salut! 😄</p>
+          </div>
+        </div>
+      </main>
+    </div>
+    <script>
+      // WebSocket connection
+      const socket = new WebSocket("ws://localhost:8081/ws");
+
+      // Connection opened
+      socket.addEventListener("open", (event) => {
+        console.log("WebSocket connected");
+      });
+
+      // Listen for messages
+      socket.addEventListener("message", (event) => {
+        console.log("WebSocket message received:", event.data);
+
+        try {
+          const data = JSON.parse(event.data);
+
+          if (data.eventType === "FileModified") {
+            console.log(`Modified file: ${data.fileName}`);
+            if (data.fileExt === ".css") {
+              document
+                .querySelectorAll("link[rel=stylesheet]")
+                .forEach(
+                  (link) =>
+                    (link.href = link.href.replace(/\?.*|$/, "?" + Date.now()))
+                );
+            } else if (data.fileExt === ".js") {
+            } else {
+              window.location.reload();
+            }
+          }
+        } catch (e) {}
+      });
+
+      // Connection closed
+      socket.addEventListener("close", (event) => {
+        console.log(event);
+
+        socket.close();
+      });
+
+      // Connection error
+      socket.addEventListener("error", (event) => {
+        console.error("WebSocket error:", event);
+      });
+
+      // Sending a message
+      function sendMessage() {
+        const message = "Hello, WebSocket!";
+        socket.send(message);
+      }
+    </script>
+  </body>
+</html>
