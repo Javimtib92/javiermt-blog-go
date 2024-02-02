@@ -1,0 +1,97 @@
+{{define "about"}}
+<div>
+  <div hx-boost="true" hx-target="#page">
+    <a href="/blog">Go to blog</a>
+  </div>
+  <div class="mx-4 md:mx-0">
+    <div>
+      <div class="mb-6 flex flex-row items-center gap-6">
+        <span
+          class="box-border flex h-20 w-20 items-center justify-center overflow-hidden rounded-full align-middle outline-none ring-2 ring-background-50 ring-slate-500 ring-offset-2 ring-offset-accent-secondary-300 dark:ring-background-500 dark:ring-offset-accent-secondary-500"
+        >
+          <img
+            alt="text"
+            fetchpriority="high"
+            width="126"
+            height="158"
+            decoding="async"
+            data-nimg="1"
+            class="flex h-full w-full object-cover"
+            style="color: transparent"
+            src="/assets/me.jpeg"
+          />
+        </span>
+
+        <div class="flex flex-col place-self-start">
+          <h1
+            class="font-display font-bold text-primary-600 dark:text-primary-100 text-3xl leading-7 sm:text-4xl"
+          >
+            Javier Muñoz Tous
+          </h1>
+          <h2
+            class="font-display text-2xl font-bold italic text-accent-500 underline underline-offset-8 dark:text-accent-400 sm:text-xl"
+          >
+            Full Stack Engineer
+          </h2>
+        </div>
+      </div>
+      <p class="prose">
+        <mark
+          class="text-primary-900 dark:text-primary-100"
+          style="--highlighted: 0"
+        >
+          <b
+            class="font-display text-2xl text-primary-600 dark:text-primary-100"
+          >
+            Hola 👋, Welcome to Coding Kittens!
+          </b>
+        </mark>
+      </p>
+      <p class="prose">
+        I&apos;m Javier Muñoz Tous and this is my own personal blog built with
+        the simple intention of creating tutorials, sharing my thoughts,
+        experimenting with new tools, having fun, and being somehow helpful to
+        our tech community.
+      </p>
+      <p class="prose">
+        I&apos;m a Fullstack Software Engineer with over{' '} {getYearDiff(new
+        Date('2015-05-01'), new Date())} years of experience. I&apos;m currently
+        specialized in JavaScript, but I&apos;m a man of the world and I can
+        “speak” many languages.
+      </p>
+      <p class="prose">
+        <mark
+          class="text-primary-900 dark:text-primary-100"
+          style="--highlighted: 0"
+        >
+          Coding Kittens&apos;s name idea came from my two adorable cats — Loki
+          and Nym — </mark
+        >{' '} who have been with me a lot of my coding time. One could say they
+        code for me and I just watch them. 🤫 My fiance came up with the name
+        idea, she is my most profound inspiration and a huge source of support.
+        🧡🖤
+      </p>
+      <p class="prose">
+        I like simple things, I practice Yoga twice a week 🧘‍♂️ I’m passionate
+        about video-games 🎮 I&apos;m a Manga and Anime &quot;Otaku&quot; ⛩️ and
+        my favorite meal is ramen 🍜
+      </p>
+      <p class="prose">
+        If you want to know me a bit better you can find me on Instagram. I warn
+        you, though, that every now and then I post stories of my cats doing
+        something tremendously silly.
+      </p>
+      <p class="prose">
+        If my professional career is what interests you, you can check my
+        LinkedIn or Github profiles.
+      </p>
+      <p class="prose">
+        I hope you find some calm and insight in this little space I&apos;ve
+        built.
+      </p>
+
+      <p class="prose">Salut! 😄</p>
+    </div>
+  </div>
+</div>
+{{ end }}

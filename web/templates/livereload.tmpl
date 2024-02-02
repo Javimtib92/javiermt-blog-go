@@ -1,0 +1,53 @@
+{{define "livereload"}}
+<script>
+  // WebSocket connection
+  const socket = new WebSocket("ws://localhost:8081/ws");
+
+  // Connection opened
+  socket.addEventListener("open", (event) => {
+    console.log("WebSocket connected");
+  });
+
+  // Listen for messages
+  socket.addEventListener("message", (event) => {
+    console.log("WebSocket message received:", event.data);
+
+    try {
+      const data = JSON.parse(event.data);
+
+      if (data.eventType === "FileModified") {
+        console.log(`Modified file: ${data.fileName}`);
+        if (data.fileExt === ".css") {
+          document
+            .querySelectorAll("link[rel=stylesheet]")
+            .forEach(
+              (link) =>
+                (link.href = link.href.replace(/\?.*|$/, "?" + Date.now()))
+            );
+        } else if (data.fileExt === ".js") {
+        } else {
+          window.location.reload();
+        }
+      }
+    } catch (e) {}
+  });
+
+  // Connection closed
+  socket.addEventListener("close", (event) => {
+    console.log(event);
+
+    socket.close();
+  });
+
+  // Connection error
+  socket.addEventListener("error", (event) => {
+    console.error("WebSocket error:", event);
+  });
+
+  // Sending a message
+  function sendMessage() {
+    const message = "Hello, WebSocket!";
+    socket.send(message);
+  }
+</script>
+{{ end }}

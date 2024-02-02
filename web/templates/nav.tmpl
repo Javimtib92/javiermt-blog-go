@@ -1,0 +1,45 @@
+{{define "nav"}}
+<nav
+  class="navbar sticky top-0 z-10 mb-12 mt-20 flex flex-row items-start py-4 pl-2 pr-4 md:-mx-[28px] md:px-5"
+>
+  <!-- <MobileNavMenu></MobileNavMenu> -->
+
+  <div
+    class="backdrop absolute left-[-8px] right-[-8px] top-0 h-20 min-w-full backdrop-blur md:-mx-[28px]"
+  ></div>
+
+  <div
+    class="img-container z-10 flex min-w-full flex-row justify-between space-x-0"
+  >
+    <a href="/" class="flex flex-row items-center">
+      <img
+        alt="text"
+        fetchpriority="high"
+        width="48"
+        height="48"
+        decoding="async"
+        class="mr-4"
+        style="color: transparent"
+        src="/assets/logo.png"
+      />
+      <div className="flex flex-col">
+        <p
+          className="m-0 font-display text-2xl font-bold text-primary-600 dark:text-2xl dark:text-primary-100 sm:text-2xl sm:dark:text-2xl"
+        >
+          Coding Kittens
+        </p>
+        <p className="prose subtle m-0" subtle>
+          Curiosity Didn&apos;t Kill The Cat
+        </p>
+      </div>
+    </a>
+
+    <div class="flex flex-row-reverse gap-6 sm:flex-row">
+      <!-- <NavigationLinks />
+              <ThemeProvider>
+                <PreferredThemeSwitch></PreferredThemeSwitch>
+              </ThemeProvider> -->
+    </div>
+  </div>
+</nav>
+{{ end }}

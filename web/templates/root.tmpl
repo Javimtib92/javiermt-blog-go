@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  {{ template "head" . }}
+  <body
+    class="bg-white text-black antialiased transition-colors dark:bg-background-700 dark:text-white"
+  >
+    <div class="mb-40 max-w-3xl md:mx-auto">
+      <main class="flex min-w-0 flex-auto flex-col px-2 md:px-0">
+        {{template "nav" .}}
+
+        <div id="page" hx-swap-oob="true">
+          {{ .template }}
+        </div>
+      </main>
+    </div>
+    <!-- Common footer content goes here -->
+
+    {{if .liveReloadEnabled }}
+    {{template "livereload"}}
+    {{ end }}
+    <script>
+        <!-- Replaces meta tags on page swap -->
+      document.addEventListener("htmx:beforeSwap", function (event) {
+        if (event.detail.target.id === "page") {
+          // Create a temporary element to hold the parsed HTML
+          const tempElement = document.createElement("html");
+          tempElement.innerHTML = event.detail.xhr.responseText;
+
+          // Get the head content from the temporary element
+          const metaTags = tempElement.querySelectorAll("meta");
+
+          // Remove existing meta tags from the current document's head
+          document.querySelectorAll("meta").forEach((tag) => tag.remove());
+
+          // Append the new meta tags to the current document's head
+          metaTags.forEach((metaTag) => {
+            document.querySelector("head").appendChild(metaTag.cloneNode(true));
+          });
+        }
+      });
+    </script>
+  </body>
+</html>
