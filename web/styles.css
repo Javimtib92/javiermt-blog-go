@@ -48,8 +48,8 @@ p {
   @apply mb-6 mt-6 text-base text-primary-800 dark:text-primary-200;
 }
 
-.prose + .subtle {
-  @apply mb-6 mt-6 text-xs text-primary-400 dark:text-primary-400;
+.subtle {
+  @apply text-xs text-primary-400 dark:text-primary-400;
 }
 
 code[data-theme*=" "],

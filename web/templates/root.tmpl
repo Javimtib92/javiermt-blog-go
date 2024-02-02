@@ -1,5 +1,11 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html
+  lang="en"
+  class="{{.theme}}"
+  x-data="theme"
+  x-bind:class="{ 'dark': theme === 'dark' }"
+  x-init="init"
+>
   {{ template "head" . }}
   <body
     class="bg-white text-black antialiased transition-colors dark:bg-background-700 dark:text-white"
@@ -19,7 +25,6 @@
     {{template "livereload"}}
     {{ end }}
     <script>
-        <!-- Replaces meta tags on page swap -->
       document.addEventListener("htmx:beforeSwap", function (event) {
         if (event.detail.target.id === "page") {
           // Create a temporary element to hold the parsed HTML
@@ -37,6 +42,42 @@
             document.querySelector("head").appendChild(metaTag.cloneNode(true));
           });
         }
+      });
+    </script>
+
+    <script>
+      function getCookie(name) {
+        const value = "; " + document.cookie;
+        const parts = value.split("; " + name + "=");
+        if (parts.length === 2) return parts.pop().split(";").shift();
+      }
+
+      function getPreferredTheme() {
+        return getCookie("theme") || (darkQuery.matches ? "dark" : "light");
+      }
+
+      document.addEventListener("alpine:init", () => {
+        Alpine.data("theme", () => {
+          const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
+
+          return {
+            theme: darkQuery.matches ? "dark" : "light",
+            toggleTheme() {
+              this.theme = this.theme === "light" ? "dark" : "light";
+              this.savePreferredTheme();
+            },
+            savePreferredTheme() {
+              document.cookie =
+                "theme=" +
+                this.theme +
+                "; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/; SameSite=Strict";
+            },
+            init() {
+              // Initialize the theme based on the preferred theme or default to 'light'
+              this.theme = getPreferredTheme();
+            },
+          };
+        });
       });
     </script>
   </body>

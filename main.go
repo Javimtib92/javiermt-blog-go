@@ -56,12 +56,15 @@ func setupRouter(liveReloadEnabled bool) *gin.Engine {
 				return
 			}
 
+			theme, err := c.Cookie("theme")
+
 			c.HTML(http.StatusOK, "root.tmpl", gin.H{
 				"liveReloadEnabled": liveReloadEnabled,
 				"Title":             data.Title,
 				"description":       "change", // You can customize this as needed
 				"route":             route,
 				"template":          template.HTML(contentBuffer.String()),
+				"theme":        	 theme,
 			})
 		})
 	}

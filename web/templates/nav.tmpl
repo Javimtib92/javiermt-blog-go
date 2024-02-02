@@ -20,25 +20,21 @@
         decoding="async"
         class="mr-4"
         style="color: transparent"
-        src="/assets/logo.png"
+        src="/assets/logo_small.webp"
       />
-      <div className="flex flex-col">
+      <div class="flex flex-col">
         <p
-          className="m-0 font-display text-2xl font-bold text-primary-600 dark:text-2xl dark:text-primary-100 sm:text-2xl sm:dark:text-2xl"
+          class="m-0 font-display text-2xl font-bold text-primary-600 dark:text-2xl dark:text-primary-100 sm:text-2xl sm:dark:text-2xl"
         >
           Coding Kittens
         </p>
-        <p className="prose subtle m-0" subtle>
-          Curiosity Didn&apos;t Kill The Cat
-        </p>
+        <p class="subtle m-0">Curiosity Didn&apos;t Kill The Cat</p>
       </div>
     </a>
 
     <div class="flex flex-row-reverse gap-6 sm:flex-row">
-      <!-- <NavigationLinks />
-              <ThemeProvider>
-                <PreferredThemeSwitch></PreferredThemeSwitch>
-              </ThemeProvider> -->
+      {{template "navigation_links" .}}
+      {{template "theme_switch_button" .}}
     </div>
   </div>
 </nav>

@@ -1,0 +1,21 @@
+{{define "theme_switch_button"}}
+<button
+  aria-label="Switch theme button"
+  x-data
+  @click="toggleTheme()"
+  class="-mx-4 -my-2 px-4 py-2"
+>
+  <span
+    id="moon-icon"
+    class="h-6 w-6 text-primary-600 dark:text-primary-100"
+    x-bind:class="theme === 'dark' ? 'block' : 'hidden'"
+    >moon</span
+  >
+  <span
+    id="sun-icon"
+    class="h-6 w-6 text-primary-600 dark:text-primary-100"
+    x-bind:class="theme === 'light' ? 'block' : 'hidden'"
+    >sun</span
+  >
+</button>
+{{ end }}
