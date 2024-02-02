@@ -12,7 +12,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func setupRouter() *gin.Engine {
+func setupRouter(liveReloadEnabled bool) *gin.Engine {
 	router := gin.Default()
 	router.GET("/ping", func(c *gin.Context) {
 		c.String(http.StatusOK, "pong")
@@ -21,6 +21,7 @@ func setupRouter() *gin.Engine {
 	router.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.tmpl", gin.H{
 			"title": "Main website",
+			"liveReloadEnabled": liveReloadEnabled,
 		})
 	})
 	router.Static("/assets", "./web/static/assets")
@@ -31,13 +32,13 @@ func setupRouter() *gin.Engine {
 }
 
 func main() {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
-  
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
 
 	liveReloadEnabled, err := strconv.ParseBool(os.Getenv("LIVE_RELOAD_ENABLED"))
 
@@ -48,8 +49,8 @@ func main() {
 	if liveReloadEnabled {
 		go livereload.StartLiveReload(ctx)
 	}
-	
 
-	r := setupRouter()
+
+	r := setupRouter(liveReloadEnabled)
 	r.Run(":8080")
 }

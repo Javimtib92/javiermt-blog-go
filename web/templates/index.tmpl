@@ -181,6 +181,7 @@
         </div>
       </main>
     </div>
+    {{if .liveReloadEnabled }}
     <script>
       // WebSocket connection
       const socket = new WebSocket("ws://localhost:8081/ws");
@@ -232,5 +233,6 @@
         socket.send(message);
       }
     </script>
+    {{ end }}
   </body>
 </html>
