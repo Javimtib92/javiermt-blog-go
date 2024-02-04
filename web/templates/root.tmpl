@@ -5,6 +5,7 @@
   x-data="theme"
   x-bind:class="{ 'dark': theme === 'dark' }"
   x-init="init"
+  style="--accent-hue: {{.accentHue}}"
 >
   {{ template "head" . }}
   <body

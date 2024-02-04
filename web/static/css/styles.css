@@ -1489,7 +1489,6 @@ mark {
     animation: highlight steps(1) both;
     animation-timeline: view();
     animation-range: entry 100% cover 10%;
-    animation-delay: 1s;
   }
 }
 

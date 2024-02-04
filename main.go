@@ -7,12 +7,40 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"regexp"
 	"strconv"
+	"strings"
 
-	livereload "coding-kittens.com/modules"
+	color "coding-kittens.com/modules/color"
+	livereload "coding-kittens.com/modules/livereload"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
+
+const CSS_PATH = "./web/styles.css"
+
+func getAccentBaseValue() string {
+	// Read the file synchronously
+	fileContent, err := os.ReadFile(CSS_PATH)
+	if err != nil {
+		// Handle error, e.g., log or return an error value
+		return ""
+	}
+
+	// Convert byte slice to string
+	fileContentStr := string(fileContent)
+
+	// Find the line containing --color-accent-base and extract its value
+	re := regexp.MustCompile(`--color-accent-base:\s*([^;]+)`)
+	match := re.FindStringSubmatch(fileContentStr)
+
+	if len(match) < 2 {
+		return ""
+	}
+
+	accentBaseValue := strings.TrimSpace(match[1])
+	return accentBaseValue
+}
 
 // RouteData represents the data needed for each route
 type RouteData struct {
@@ -45,6 +73,15 @@ func setupRouter(liveReloadEnabled bool) *gin.Engine {
 		data := data
 
 		router.GET(route, func(c *gin.Context) {
+			// Retrieve the accent base value
+			accentBaseHSL, parseError := color.HextoHSL(getAccentBaseValue())
+
+			if parseError != nil {
+				log.Fatal(parseError)
+			}
+
+			log.Print("accentBaseHSL",accentBaseHSL)
+
 			t := template.Must(
 				template.New(data.Content).ParseFiles("./web/templates/" + data.Content + ".tmpl"),
 			)
@@ -65,6 +102,7 @@ func setupRouter(liveReloadEnabled bool) *gin.Engine {
 				"route":             route,
 				"template":          template.HTML(contentBuffer.String()),
 				"theme":        	 theme,
+				"accentHue": accentBaseHSL.H,
 			})
 		})
 	}
