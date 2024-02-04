@@ -351,6 +351,51 @@
   size-adjust: 113.95%;
 }
 
+@font-face {
+  font-family: Oxygen_Mono;
+
+  font-style: normal;
+
+  font-weight: 400;
+
+  font-display: swap;
+
+  src: url(../fonts/OxygenMono/OxygenMono-Regular.woff2) format("woff2");
+
+  unicode-range: u+0100-02af, u+0304, u+0308, u+0329, u+1e00-1e9f, u+1ef2-1eff,
+    u+2020, u+20a0-20ab, u+20ad-20cf, u+2113, u+2c60-2c7f, u+a720-a7ff;
+}
+
+@font-face {
+  font-family: Oxygen_Mono;
+
+  font-style: normal;
+
+  font-weight: 400;
+
+  font-display: swap;
+
+  src: url(../fonts/OxygenMono/OxygenMono-Regular.woff2) format("woff2");
+
+  unicode-range: u+00??, u+0131, u+0152-0153, u+02bb-02bc, u+02c6, u+02da,
+    u+02dc, u+0304, u+0308, u+0329, u+2000-206f, u+2074, u+20ac, u+2122, u+2191,
+    u+2193, u+2212, u+2215, u+feff, u+fffd;
+}
+
+@font-face {
+  font-family: Oxygen_Mono_Fallback;
+
+  src: local("Arial");
+
+  ascent-override: 72.37%;
+
+  descent-override: 24.14%;
+
+  line-gap-override: 0%;
+
+  size-adjust: 135.95%;
+}
+
 /*
 ! tailwindcss v3.4.1 | MIT License | https://tailwindcss.com
 */
@@ -936,6 +981,10 @@ video {
   z-index: 10;
 }
 
+.-m-2 {
+  margin: -0.5rem;
+}
+
 .m-0 {
   margin: 0px;
 }
@@ -975,6 +1024,10 @@ video {
   margin-top: 5rem;
 }
 
+.mt-6 {
+  margin-top: 1.5rem;
+}
+
 .box-border {
   box-sizing: border-box;
 }
@@ -991,12 +1044,24 @@ video {
   display: none;
 }
 
+.h-1 {
+  height: 0.25rem;
+}
+
 .h-20 {
   height: 5rem;
 }
 
 .h-6 {
   height: 1.5rem;
+}
+
+.h-8 {
+  height: 2rem;
+}
+
+.h-auto {
+  height: auto;
 }
 
 .h-full {
@@ -1009,6 +1074,18 @@ video {
 
 .w-6 {
   width: 1.5rem;
+}
+
+.w-8 {
+  width: 2rem;
+}
+
+.w-\[90\%\] {
+  width: 90%;
+}
+
+.w-auto {
+  width: auto;
 }
 
 .w-full {
@@ -1059,6 +1136,10 @@ video {
   justify-content: space-between;
 }
 
+.gap-4 {
+  gap: 1rem;
+}
+
 .gap-6 {
   gap: 1.5rem;
 }
@@ -1081,6 +1162,22 @@ video {
   border-radius: 9999px;
 }
 
+.border-b {
+  border-bottom-width: 1px;
+}
+
+.border-solid {
+  border-style: solid;
+}
+
+.border-b-primary-200 {
+  border-bottom-color: color-mix(in srgb, var(--color-primary-base) 30%, white);
+}
+
+.bg-primary-100 {
+  background-color: color-mix(in srgb, var(--color-primary-base) 10%, white);
+}
+
 .bg-white {
   --tw-bg-opacity: 1;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity));
@@ -1091,6 +1188,15 @@ video {
      object-fit: cover;
 }
 
+.p-2 {
+  padding: 0.5rem;
+}
+
+.px-0 {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
 .px-2 {
   padding-left: 0.5rem;
   padding-right: 0.5rem;
@@ -1099,6 +1205,11 @@ video {
 .px-4 {
   padding-left: 1rem;
   padding-right: 1rem;
+}
+
+.px-6 {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
 }
 
 .py-1 {
@@ -1128,8 +1239,16 @@ video {
   vertical-align: middle;
 }
 
+.font-body {
+  font-family: var(--font-body);
+}
+
 .font-display {
   font-family: var(--font-display);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
 }
 
 .text-2xl {
@@ -1140,6 +1259,11 @@ video {
 .text-3xl {
   font-size: 1.875rem;
   line-height: 2.25rem;
+}
+
+.text-xs {
+  font-size: 0.75rem;
+  line-height: 1rem;
 }
 
 .font-bold {
@@ -1161,6 +1285,10 @@ video {
 .text-black {
   --tw-text-opacity: 1;
   color: rgb(0 0 0 / var(--tw-text-opacity));
+}
+
+.text-primary-400 {
+  color: color-mix(in srgb, var(--color-primary-base) 70%, white);
 }
 
 .text-primary-600 {
@@ -1730,6 +1858,18 @@ a {
   background-color: color-mix(in srgb, var(--color-background-base) 90%, white) !important;
 }
 
+.hover\:text-accent-400:hover {
+  color: color-mix(in srgb, var(--color-accent-base) 70%, white);
+}
+
+:is(.dark .dark\:border-b-background-400) {
+  border-bottom-color: color-mix(in srgb, var(--color-background-base) 90%, white);
+}
+
+:is(.dark .dark\:bg-background-500) {
+  background-color: var(--color-background-base);
+}
+
 :is(.dark .dark\:bg-background-700) {
   background-color: color-mix(in srgb, var(--color-background-base), black 30%);
 }
@@ -1747,6 +1887,10 @@ a {
   color: color-mix(in srgb, var(--color-primary-base) 10%, white);
 }
 
+:is(.dark .dark\:text-primary-400) {
+  color: color-mix(in srgb, var(--color-primary-base) 70%, white);
+}
+
 :is(.dark .dark\:text-white) {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity));
@@ -1760,6 +1904,10 @@ a {
   --tw-ring-offset-color: var(--color-accent-secondary-base);
 }
 
+:is(.dark .dark\:hover\:text-accent-300:hover) {
+  color: color-mix(in srgb, var(--color-accent-base) 50%, white);
+}
+
 @media (min-width: 640px) {
   .sm\:flex {
     display: flex;
@@ -1769,8 +1917,34 @@ a {
     display: none;
   }
 
+  .sm\:h-12 {
+    height: 3rem;
+  }
+
+  .sm\:w-12 {
+    width: 3rem;
+  }
+
+  .sm\:w-full {
+    width: 100%;
+  }
+
   .sm\:flex-row {
     flex-direction: row;
+  }
+
+  .sm\:items-center {
+    align-items: center;
+  }
+
+  .sm\:px-0 {
+    padding-left: 0px;
+    padding-right: 0px;
+  }
+
+  .sm\:px-2 {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
   }
 
   .sm\:text-2xl {

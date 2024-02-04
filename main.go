@@ -63,7 +63,6 @@ var routes = map[string]RouteData{
 
 			difference := today.Sub(fromDate)
 
-			// Your data calculation logic here
 			return map[string]interface{}{
 				"yearDiff": int64(difference.Hours()/24/365),
 			}

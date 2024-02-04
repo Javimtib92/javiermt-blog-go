@@ -1,5 +1,6 @@
 @import url("./static/fonts/BarlowCondensed/styles.css");
 @import url("./static/fonts/Montserrat/styles.css");
+@import url("./static/fonts/OxygenMono/styles.css");
 
 @tailwind base;
 @tailwind components;
