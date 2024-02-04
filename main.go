@@ -10,9 +10,10 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
-	color "coding-kittens.com/modules/color"
-	livereload "coding-kittens.com/modules/livereload"
+	"coding-kittens.com/modules/color"
+	"coding-kittens.com/modules/livereload"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -42,16 +43,31 @@ func getAccentBaseValue() string {
 	return accentBaseValue
 }
 
+type ComputeData func(c *gin.Context) map[string]interface{}
+
 // RouteData represents the data needed for each route
 type RouteData struct {
 	Title   string
 	Content string
+	ComputeData ComputeData
 }
 
 var routes = map[string]RouteData{
 	"/": {
 		Title:   "Home Page",
 		Content: "about",
+		ComputeData: func(c *gin.Context) map[string]interface{} {
+			fromDate := time.Date(2015, time.May, 1, 0, 0, 0, 0, time.UTC)
+			
+			today := time.Now()
+
+			difference := today.Sub(fromDate)
+
+			// Your data calculation logic here
+			return map[string]interface{}{
+				"yearDiff": int64(difference.Hours()/24/365),
+			}
+		},
 	},
 	"/blog": {
 		Title:   "Blog",
@@ -87,7 +103,17 @@ func setupRouter(liveReloadEnabled bool) *gin.Engine {
 			)
 
 			var contentBuffer bytes.Buffer
-			err := t.ExecuteTemplate(&contentBuffer, data.Content, nil)
+
+			var templateData map[string]interface{}
+
+			if data.ComputeData != nil {
+				templateData = data.ComputeData(c)
+			} else {
+				templateData = make(map[string]interface{})
+			}
+
+			err := t.ExecuteTemplate(&contentBuffer, data.Content, templateData)
+
 			if err != nil {
 				c.AbortWithStatus(http.StatusNotFound)
 				return
@@ -98,11 +124,11 @@ func setupRouter(liveReloadEnabled bool) *gin.Engine {
 			c.HTML(http.StatusOK, "root.tmpl", gin.H{
 				"liveReloadEnabled": liveReloadEnabled,
 				"Title":             data.Title,
-				"description":       "change", // You can customize this as needed
+				"description":       "change",
 				"route":             route,
 				"template":          template.HTML(contentBuffer.String()),
 				"theme":        	 theme,
-				"accentHue": accentBaseHSL.H,
+				"accentHue": 		 accentBaseHSL.H,
 			})
 		})
 	}
