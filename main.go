@@ -22,10 +22,6 @@ func setupRouter() *gin.Engine {
 
 	router.Use(middlewares.SetContextDataMiddleware())
 
-	router.GET("/ping", func(c *gin.Context) {
-		c.String(http.StatusOK, "pong")
-	})
-
 	router.LoadHTMLGlob("web/templates/*")
 
 	routesMap := routes.GetRoutes()
@@ -37,7 +33,7 @@ func setupRouter() *gin.Engine {
 		router.GET(route, handleRoute(data))
 	}
 
-	router.StaticFS("/", gin.Dir("./web/static", true))
+	router.StaticFS("/static", gin.Dir("./web/static", true))
 	router.StaticFile("/favicon.ico", "./web/favicon.ico")
 
 	return router
