@@ -45,19 +45,7 @@ func setupRouter() *gin.Engine {
 
 func handleRoute(data routes.RouteData) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Retrieve the custom context data
-		contextData, exists := c.Get("ContextData")
-		if !exists {
-			log.Fatal("ContextData not set")
-			return
-		}
-
-		// Type assert the context data to the custom struct
-		ctxData, ok := contextData.(middlewares.ContextData)
-		if !ok {
-			log.Fatal("Failed to type assert ContextData")
-			return
-		}
+		ctxData := c.MustGet("ContextData").(middlewares.ContextData)
 
 		renderTemplate(c, data, ctxData.LiveReloadEnabled, ctxData.AccentBaseHSL)
 	}
