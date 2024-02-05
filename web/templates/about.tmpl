@@ -103,7 +103,7 @@
 
     {{ template "latest_content" . }}
 
-    <div>
+    <div hx-boost="true" hx-target="#page">
       <a
         href="/blog"
         class="flex flex-row items-center gap-2 text-md font-body text-accent-500 hover:text-accent-400 dark:text-accent-400 dark:hover:text-accent-300"

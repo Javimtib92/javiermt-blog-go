@@ -38,8 +38,6 @@ func AboutController (c *gin.Context) map[string]interface{} {
 
 		frontmatter.MustParse(bytes.NewReader(file), &matter)
 
-		fmt.Printf("%+v\n", matter)
-
 		article := models.Article{
 			Slug:      content.FileName,
 			Category:  content.Path[0],

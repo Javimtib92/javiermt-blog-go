@@ -6,7 +6,6 @@ import (
 	"time"
 )
 
-// FileInfo represents information about a file.
 type FileInfo struct {
 	Path       []string
 	FileName   string
@@ -14,7 +13,6 @@ type FileInfo struct {
 	ModifiedAt time.Time
 }
 
-// FileCrawler is a generator function to crawl files in a directory.
 func FileCrawler(dir string, path []string) <-chan FileInfo {
 	fileInfoChan := make(chan FileInfo)
 
