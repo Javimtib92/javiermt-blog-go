@@ -17,7 +17,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func setupRouter(liveReloadEnabled bool) *gin.Engine {
+func setupRouter() *gin.Engine {
 	router := gin.Default()
 
 	router.Use(middlewares.SetContextDataMiddleware())
@@ -34,7 +34,7 @@ func setupRouter(liveReloadEnabled bool) *gin.Engine {
 		route := route
 		data := data
 
-		router.GET(route, handleRoute(data, liveReloadEnabled))
+		router.GET(route, handleRoute(data))
 	}
 
 	router.StaticFS("/", gin.Dir("./web/static", true))
@@ -43,7 +43,7 @@ func setupRouter(liveReloadEnabled bool) *gin.Engine {
 	return router
 }
 
-func handleRoute(data routes.RouteData, liveReloadEnabled bool) gin.HandlerFunc {
+func handleRoute(data routes.RouteData) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Retrieve the custom context data
 		contextData, exists := c.Get("ContextData")
@@ -113,6 +113,6 @@ func main() {
 		go livereload.StartLiveReload(ctx)
 	}
 
-	r := setupRouter(liveReloadEnabled)
+	r := setupRouter()
 	r.Run(":8080")
 }
