@@ -94,5 +94,24 @@
       <p class="prose">Salut! 😄</p>
     </div>
   </div>
+  <div class="mt-12">
+    <h3
+      class="font-display text-xl font-bold text-primary-600 dark:text-primary-100 sm:text-2xl"
+    >
+      The Latest Coding Kittens Posts
+    </h3>
+
+    {{ template "latest_content" . }}
+
+    <div>
+      <a
+        href="/blog"
+        class="flex flex-row items-center gap-2 text-md font-body text-accent-500 hover:text-accent-400 dark:text-accent-400 dark:hover:text-accent-300"
+      >
+        Browse all posts
+        <!-- <ArrowRightIcon width={12} height={12} /> -->
+      </a>
+    </div>
+  </div>
 </div>
 {{ end }}

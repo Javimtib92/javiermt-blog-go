@@ -1,0 +1,240 @@
+---
+title: 'How to fix Stack-Size limit error of a recursive function using iteration in JavaScript'
+createdAt: 2024-01-05
+thumbnail: /assets/thumbnails/abstract.webp
+subtitle: Recursive who?
+shortDescription: >
+  Explore an alternative approach in walking through a deep object tree using iteration instead of recursion to fix stack-size limit error.
+---
+
+import { Highlight } from '@/components/highlight';
+
+One day at work I had to walk through a complex data structure to remove some circular references (Contentful CMS and linked entries anyone?) and stumbled upon this error:
+
+```bash
+RangeError: Maximum call stack size exceeded (Chrome)
+InternalError: too much recursion (Firefox)
+RangeError: Maximum call stack size exceeded. (Safari)
+
+# Some browsers are a bit more human than others at telling you the bad news 👀
+```
+
+I was using a fancy recursive function to traverse this data and I got hit by the max call stack size defined for the node process.
+Bummer. The worst thing is that this compromised production and because we didn't add error handling to this function our users were experiencing a Black Screen of Death.
+
+<Highlight>By the end of this post you will learn how to avoid this situation by converting a recursive function into its iterative counterpart</Highlight>.
+But first I will give you a small introduction to the recursive approach.
+
+## The shape of disaster, the recursive attempt
+
+For reference, this is a simplified version of the code that caused all this mess:
+
+```js title="normalize.js"
+function normalizeObject(object) {
+  if (Array.isArray(object)) {
+    for (const item of object) {
+      normalizeObject(item);
+    }
+  } else if (object !== null && typeof object === 'object') {
+    for (const property in object) {
+      // We are doing things here to check candidates for circular references and remove them. Like the following:
+      // if (object[property]?.sys?.id === 'internalLink') {
+      //   delete object[property].page;
+      // }
+      normalizeObject(object[property]);
+    }
+  }
+}
+
+normalizeObject(complexObject);
+```
+
+This recursion works as follows:
+
+
+1. The function takes an `Object` as its parameter.
+
+2. It first checks if the object is an `Array` using `Array.isArray(object)`. If true, it iterates over each element in the array and recursively calls `normalizeObject` on each element.
+
+3. Else if is not `null` and is of type `Object`, it means it's an object. &mdash;array and null are of type `Object` in Javascript that's why we check that is not null&mdash; In this case, it iterates over its properties using a `for...in` loop. For each property, it performs the desired operation and recursively calls `normalizeObject` on the property value.
+
+This approach was working fine until it didn't.
+
+## Buckle up, things are going to get interesting
+
+After some research I found a node v8 option to increase the stack size called `--stack-size`
+but tweaking that option didn't feel right. I have nothing against that option, if it solves the
+problem it should be fine, right? But that flag is unreliable as discussed in [this github issue](https://github.com/nodejs/node/issues/6360).
+
+So, back to our problem solving, after some more research I came across [this article](https://exploringjs.com/es6/ch_tail-calls.html) about **Tail Call Optimization**.
+
+> ECMAScript 6 offers tail call optimization, where you can make some function calls without growing the call stack.
+
+Well, that looks promising BUT seconds later I got hit by reality. 🤯
+
+> Warning: Even though tail call optimization is part of the language specification, it isn’t supported by many engines and that may never change.
+
+Back to square one, I had to find an alternative and that's when I found out that a recursive function could be translated to an iterative version.
+
+## Our well-known buddy, the iteration
+
+The concept for the iterative approach is simple, <Highlight>it uses a stack or queue to sequentially process elements of a data structure without recursion</Highlight>.
+
+```js title="normalize.js"
+function normalizeObject(object) {
+  let queue = [object];
+
+  while (queue.length) {
+    const current = queue.shift();
+
+    if (Array.isArray(current)) {
+      queue = [...queue, ...current];
+    }
+
+    if (current !== null && typeof current === 'object') {
+      for (const property in current) {
+        // We are doing things here to check candidates for circular references and remove them. Like the following:
+        // if (object[property]?.sys?.id === 'internalLink') {
+        //   delete object[property].page;
+        // }
+        queue.push(current[property]);
+      }
+    }
+  }
+}
+
+...
+
+normalizeObject(complexObject);
+```
+
+Here's a breakdown of the code:
+
+1. The function takes an `Object` as its parameter.
+
+2. It initializes a queue `Array` with the input object as its only element.
+
+3. The code enters a `while` loop that continues as long as the queue is not empty.
+
+4. Inside the loop, it dequeues the first element (current) from the queue.
+
+5. If current is an `Array`, its elements are spread into the queue.
+
+6. If current is an `Object` (and not null), it iterates through its properties using a `for...in` loop.
+
+7. For each property, it makes the necessary changes and then enqueues the property value into the queue.
+
+8. The process continues until the queue is empty.
+
+Converting the recursive function into this iterative version fixed the Stack-Size Limit error. There might be other alternatives I haven't discovered yet
+but that solution worked well for our use-case.
+
+To wrap up, in this post we saw that recursion can throw an error if objects
+are too complex and the call stack of the recursion grows massively. We analyzed
+the function that caused this error and went through a real-world example of how
+we approached the solution. From discovering TCO, figuring out that not all engines
+where onboard with tail call optimization, to eventually realizing that the same
+function could be written using an iteration which finally solved our problem.
+
+Be careful though and always analyze your problem because, for us, iterative
+approach was sometimes slower than recursion depending on the operations done inside and other factors I don't fully understand.
+
+But that doesn't matter if the recursion throws an error right? 😄
+
+## Bonus
+
+If you want to test this out you can create the following file:
+
+```js title="recursion-test.js"
+const createDeeplyNestedObject = (depth, currentDepth = 0) => {
+  if (currentDepth === depth) {
+    return 'Reached maximum depth';
+  }
+
+  return {
+    nestedObject: createDeeplyNestedObject(depth, currentDepth + 1),
+  };
+};
+
+const iterativeReplacer = (value) => {
+  let queue = [value];
+
+  while (queue.length) {
+    const current = queue.shift();
+
+    if (Array.isArray(current)) {
+      queue = [...queue, ...current];
+    } else if (current !== null && typeof current === 'object') {
+      for (const property in current) {
+        queue.push(current[property]);
+      }
+    }
+  }
+};
+
+const recursiveReplacer = (value) => {
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      recursiveReplacer(item);
+    }
+  } else if (value !== null && typeof value === 'object') {
+    for (const property in value) {
+      recursiveReplacer(value[property]);
+    }
+  }
+};
+
+(() => {
+  /**
+   *  I manually tweaked the depth of this object to avoid a Stack-Size limit
+   *  in the recursive function that creates the object.
+   *
+   *  Adjust the depth number for different results.
+   */
+  const deeplyNestedObject = createDeeplyNestedObject(6000);
+
+  const startRecursive = performance.now();
+
+  try {
+    recursiveReplacer(deeplyNestedObject);
+
+    console.log('\x1b[32m%s\x1b[0m', 'Recursive function succeed');
+  } catch (e) {
+    console.log('\x1b[31m%s\x1b[0m', 'Recursive function failed');
+  } finally {
+    const endRecursive = performance.now();
+    const timeSpent = endRecursive - startRecursive;
+
+    console.log(`Time spent processing: ${timeSpent} milliseconds`);
+  }
+
+  console.log('-------------');
+
+  const startIterative = performance.now();
+
+  try {
+    iterativeReplacer(deeplyNestedObject);
+
+    console.log('\x1b[32m%s\x1b[0m', 'Iterative function succeed');
+  } catch (e) {
+    console.log('\x1b[31m%s\x1b[0m', 'Iterative function failed');
+  } finally {
+    const endIterative = performance.now();
+    const timeSpent = endIterative - startIterative;
+
+    console.log(`Time spent processing: ${timeSpent} milliseconds`);
+  }
+})();
+```
+
+Running node to execute this file will lead to the following result:
+
+```bash
+node recursion-test.js
+
+Recursive function failed
+Time spent processing: 5.062059998512268 milliseconds
+-------------
+Iterative function succeed
+Time spent processing: 4.321290999650955 milliseconds
+```

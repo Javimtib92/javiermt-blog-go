@@ -17,6 +17,7 @@ import (
 const (
 	CSSExtension  = ".css"
 	TmplExtension = ".tmpl"
+	GoExtension = ".go"
 )
 
 var wsMutex sync.Mutex
@@ -42,7 +43,7 @@ func StartLiveReload(ctx context.Context) {
 	}
 	defer watcher.Close()
 
-	err = watcher.Add("./web")
+	err = watcher.Add("./")
 	err = watcher.Add("./web/templates")
 	if err != nil {
 		log.Fatal(err)
@@ -92,7 +93,7 @@ func StartLiveReload(ctx context.Context) {
 				if event.Op&fsnotify.Write == fsnotify.Write {
 					ext := filepath.Ext(event.Name)
 
-					if ext == CSSExtension || ext == TmplExtension {
+					if ext == CSSExtension || ext == TmplExtension || ext == GoExtension {
 						if debounceTimer != nil {
 							debounceTimer.Stop()
 						}

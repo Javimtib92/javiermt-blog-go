@@ -1,0 +1,25 @@
+{{ define "latest_content" }}
+<div class="my-4">
+  {{ range.LatestContent }}
+  <a
+    key="{{.Slug}}"
+    href="/blog/{{.Category}}/{{.Slug}}"
+    class="my-8 flex cursor-pointer flex-row items-center gap-4 bg-primary-50 p-4 hover:bg-primary-100 dark:bg-background-600 hover:dark:bg-background-500"
+  >
+    <img
+      alt="{{.Title}}"
+      loading="lazy"
+      width="50"
+      height="50"
+      decoding="async"
+      data-nimg="1"
+      style="color: transparent"
+      src="{{.Data.Thumbnail}}"
+    />
+    <div class="sm:text-md max-w-56 text-xs sm:max-w-full">
+      {{.Data.Title}}
+    </div>
+  </a>
+  {{ end }}
+</div>
+{{ end }}

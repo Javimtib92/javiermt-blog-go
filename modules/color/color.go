@@ -3,7 +3,6 @@ package color
 import (
 	"errors"
 	"fmt"
-	"log"
 	"math"
 )
 
@@ -84,7 +83,6 @@ func (c RGB) ToHSL() HSL {
 func HextoHSL(c string) (HSL, error) {
 	rgb, err := HexToRgb(c);
 
-	log.Print("rgb", rgb)
 	if err != nil {
 		return HSL{}, err
 	}
