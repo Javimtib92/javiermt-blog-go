@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html
   lang="en"
-  class="{{.theme}}"
+  class="{{.THEME}}"
   x-data="theme"
   x-bind:class="{ 'dark': theme === 'dark' }"
   x-init="init"
-  style="--accent-hue: {{.accentHue}}"
+  style="--accent-hue: {{.AccentHue}}"
 >
   {{ template "head" . }}
   <body
@@ -24,7 +24,7 @@
     {{template "footer" .}}
     <!-- Common footer content goes here -->
 
-    {{if .liveReloadEnabled }}
+    {{if .LiveReloadEnabled }}
     {{template "livereload"}}
     {{ end }}
     <script>

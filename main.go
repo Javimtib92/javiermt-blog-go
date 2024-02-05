@@ -10,7 +10,6 @@ import (
 	"strconv"
 
 	"coding-kittens.com/middlewares"
-	"coding-kittens.com/modules/color"
 	"coding-kittens.com/modules/livereload"
 	"coding-kittens.com/routes"
 	"github.com/gin-gonic/gin"
@@ -24,12 +23,7 @@ func setupRouter() *gin.Engine {
 
 	router.LoadHTMLGlob("web/templates/*")
 
-	routesMap := routes.GetRoutes()
-
-	for route, data := range routesMap {
-		route := route
-		data := data
-
+	for route, data := range routes.GetRoutes() {
 		router.GET(route, handleRoute(data))
 	}
 
@@ -43,11 +37,11 @@ func handleRoute(data routes.RouteData) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctxData := c.MustGet("ContextData").(middlewares.ContextData)
 
-		renderTemplate(c, data, ctxData.LiveReloadEnabled, ctxData.AccentBaseHSL)
+		renderTemplate(c, data, ctxData)
 	}
 }
 
-func renderTemplate(c *gin.Context, data routes.RouteData, liveReloadEnabled bool, accentBaseHSL color.HSL) {
+func renderTemplate(c *gin.Context, data routes.RouteData, ctxData middlewares.ContextData) {
 	t := template.Must(template.New(data.Content).ParseGlob("./web/templates/*.tmpl"))
 
 	var contentBuffer bytes.Buffer
@@ -69,13 +63,13 @@ func renderTemplate(c *gin.Context, data routes.RouteData, liveReloadEnabled boo
 	theme, err := c.Cookie("theme")
 
 	c.HTML(http.StatusOK, "root.tmpl", gin.H{
-		"liveReloadEnabled": liveReloadEnabled,
+		"LiveReloadEnabled": ctxData.LiveReloadEnabled,
 		"Title":             data.Title,
-		"description":       "change",
-		"route":             c.Request.URL.Path,
-		"template":          template.HTML(contentBuffer.String()),
-		"theme":             theme,
-		"accentHue":         accentBaseHSL.H,
+		"Description":       "change to some metadata description, can be overriden on route basis",
+		"Route":             c.Request.URL.Path,
+		"Template":          template.HTML(contentBuffer.String()),
+		"Theme":             theme,
+		"AccentHue":         ctxData.AccentBaseHSL.H,
 	})
 }
 
