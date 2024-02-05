@@ -3,9 +3,9 @@ package routes
 import "coding-kittens.com/controllers"
 
 type RouteData struct {
-	Title   string
-	Content string
-	Controller controllers.ControllerFunc
+	Title   string // metadata title
+	Content string // template name to be used. for example for "about.tmpl" Content is equal to "about"
+	Controller controllers.ControllerFunc // controller function to send data to the template
 }
 
 func GetRoutes() map[string]RouteData {
