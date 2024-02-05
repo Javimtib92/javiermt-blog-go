@@ -37,9 +37,7 @@ func setupRouter(liveReloadEnabled bool) *gin.Engine {
 		router.GET(route, handleRoute(data, liveReloadEnabled))
 	}
 
-	router.Static("/assets", "./web/static/assets")
-	router.Static("/css", "./web/static/css")
-	router.Static("/fonts", "./web/static/fonts")
+	router.StaticFS("/", gin.Dir("./web/static", true))
 	router.StaticFile("/favicon.ico", "./web/favicon.ico")
 
 	return router
