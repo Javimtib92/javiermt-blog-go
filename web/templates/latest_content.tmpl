@@ -15,6 +15,11 @@
       data-nimg="1"
       style="color: transparent"
       src="{{.Data.Thumbnail}}"
+      srcset="
+        /image?url={{.Data.Thumbnail}}&w=64  1x,
+        /image?url={{.Data.Thumbnail}}&w=128 2x
+      "
+      src="/image?url={{.Data.Thumbnail}}&w=128"
     />
     <div class="sm:text-md max-w-56 text-xs sm:max-w-full">
       {{.Data.Title}}

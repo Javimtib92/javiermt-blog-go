@@ -13,15 +13,21 @@
   >
     <a href="/" class="flex flex-row items-center">
       <img
-        alt="text"
-        fetchpriority="high"
+        alt="website logo"
+        loading="lazy"
         width="48"
         height="48"
         decoding="async"
+        data-nimg="1"
         class="mr-4"
         style="color: transparent"
-        src="/static/assets/logo_small.webp"
+        srcset="
+          /image?url=/static/assets/logo.png&w=48 1x,
+          /image?url=/static/assets/logo.png&w=96 2x
+        "
+        src="/image?url=/static/assets/logo.png&w=96"
       />
+
       <div class="flex flex-col">
         <p
           class="m-0 font-display text-2xl font-bold text-primary-600 dark:text-2xl dark:text-primary-100 sm:text-2xl sm:dark:text-2xl"

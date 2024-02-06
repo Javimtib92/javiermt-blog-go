@@ -10,6 +10,7 @@ import (
 	"strconv"
 
 	"coding-kittens.com/middlewares"
+	"coding-kittens.com/modules/image"
 	"coding-kittens.com/modules/livereload"
 	"coding-kittens.com/routes"
 	"github.com/gin-gonic/gin"
@@ -27,6 +28,7 @@ func setupRouter() *gin.Engine {
 		router.GET(route, handleRoute(data))
 	}
 
+	router.GET("/image", image.ProcessImage)
 	router.StaticFS("/static", gin.Dir("./web/static", true))
 	router.StaticFile("/favicon.ico", "./web/favicon.ico")
 
