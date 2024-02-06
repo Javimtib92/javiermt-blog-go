@@ -1,65 +1,104 @@
 package image
 
 import (
+	"fmt"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
+	"coding-kittens.com/modules/cache"
 	"github.com/gin-gonic/gin"
 	"github.com/h2non/bimg"
 )
 
+// Define the cache directory
+const cacheDir = "./cache/images"
+
+// Define the cache instance
+var imageCache = cache.NewFilesystemCache(cacheDir)
+
+var urlPattern = regexp.MustCompile(`^web/static/assets/[^\.]+\.(jpeg|jpg|png|gif|webp|avif)$`)
+
+
+func GenerateCacheKey(imageURL string, width, height int, mimeType string) string {
+    parts := strings.Split(mimeType, "/")
+
+    return fmt.Sprintf("%s_%d_%d.%s", imageURL, width, height, parts[1])
+}
+
 var ImageTypeFromString = reverseMap(bimg.ImageTypes)
 
 func ProcessImage(c *gin.Context) {
-    // Get the image URL from the query parameter
 	imagePath := filepath.Join("./web/", c.Query("url"))
 
-    // Fetch the image from the URL
+    if !urlPattern.MatchString(imagePath) {
+        c.JSON(400, gin.H{"error": "Invalid image URL"})
+        return
+    }
+    
     imageBytes, err := bimg.Read(imagePath)
     if err != nil {
         c.JSON(400, gin.H{"error": "Failed to read the image"})
         return
     }
 
-	// Extract original image width and height
 	size, err := bimg.Size(imageBytes)
 	if err != nil {
 		c.JSON(400, gin.H{"error": "Failed to get original image dimensions"})
 		return
 	}
 
-    // Extract width and height from query parameters
     widthStr := c.DefaultQuery("w", strconv.Itoa(size.Width))
     heightStr := c.Query("h")
 
-    width := atoi(widthStr)
-    height := size.Height // Default to original height if height is not provided
-
-    if heightStr != "" {
-        height = atoi(heightStr)
-    } else {
-        // If height is not provided, calculate the corresponding height to preserve aspect ratio
-        height = (size.Height * width) / size.Width
-    }
-	quality := c.DefaultQuery("q", "80")
-
-    // Resize the image
-    resizedImage, err := bimg.Resize(imageBytes, bimg.Options{
-        Width:  width,
-        Height: height,
-		Quality: atoi(quality),
-    })
-    if err != nil {
-        c.JSON(400, gin.H{"error": "Failed to resize the image"})
+    width, err := strconv.Atoi(widthStr)
+    if err != nil || width <= 0 {
+        c.JSON(400, gin.H{"error": "Invalid width"})
         return
     }
 
-	// Get supported MIME types
+    var height int
+    if heightStr != "" {
+        height, err = strconv.Atoi(heightStr)
+        if err != nil || height <= 0 {
+            c.JSON(400, gin.H{"error": "Invalid height"})
+            return
+        }
+    } else {
+        // Calculate height to preserve aspect ratio
+        height = (size.Height * width) / size.Width
+    }
+
+	qualityStr := c.DefaultQuery("q", "80")
+    quality, err := strconv.Atoi(qualityStr)
+    if err != nil || quality <= 0 || quality > 100 {
+        c.JSON(400, gin.H{"error": "Invalid quality"})
+        return
+    }
+
     options := []string{"image/avif", "image/webp", "image/jpeg", "image/png", "image/gif"}
     mimeType := getSupportedMimeType(options, c)
     if mimeType == "" {
         c.JSON(400, gin.H{"error": "No supported MIME type found"})
+        return
+    }
+
+    cacheKey := GenerateCacheKey(imagePath, width, height, mimeType)
+
+    if cachedImage, mimeType, err := imageCache.Get(cacheKey); err == nil {
+        c.Data(200, mimeType, cachedImage)
+        return
+    }
+
+    resizedImage, err := bimg.Resize(imageBytes, bimg.Options{
+        Width:  width,
+        Height: height,
+		Quality: quality,
+    })
+    if err != nil {
+        c.JSON(400, gin.H{"error": "Failed to resize the image"})
         return
     }
 
@@ -72,7 +111,8 @@ func ProcessImage(c *gin.Context) {
         imageBytes = img
     }
 
-    // Return the resized image
+    imageCache.Set(cacheKey, resizedImage, mimeType, 7 * 24 * time.Hour)
+
     c.Data(200, mimeType, resizedImage)
 }
 
@@ -87,7 +127,6 @@ func reverseMap(originalMap map[bimg.ImageType]string) map[string]bimg.ImageType
 }
 
 func getImageTypeFromString(mimeType string) bimg.ImageType {
-    // Lookup the ImageType in the map
     if imageType, ok := ImageTypeFromString[mimeType]; ok {
         return imageType
     }
@@ -96,13 +135,10 @@ func getImageTypeFromString(mimeType string) bimg.ImageType {
 }
 
 func getSupportedMimeType(options []string, c *gin.Context) string {
-	// Get accept header from Gin context
 	accept := c.GetHeader("Accept")
 
-	// Find the best match between the supported mime types and the accept header
 	mimeType := mediaType(accept, options)
 
-	// Check if the mimeType is included in the accept header
 	if strings.Contains(accept, mimeType) {
 		return mimeType
 	}

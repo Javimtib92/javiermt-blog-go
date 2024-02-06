@@ -1,2 +1,3 @@
-tailwindcss
-.env
+/tailwindcss
+/.env
+/cache
