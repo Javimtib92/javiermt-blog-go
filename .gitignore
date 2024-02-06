@@ -1,3 +1,4 @@
 /tailwindcss
 /.env
 /cache
+*.pem

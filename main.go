@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"flag"
 	"html/template"
 	"log"
 	"net/http"
@@ -13,6 +14,7 @@ import (
 	"coding-kittens.com/modules/image"
 	"coding-kittens.com/modules/livereload"
 	"coding-kittens.com/routes"
+	ginCompressor "github.com/CAFxX/httpcompression/contrib/gin-gonic/gin"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -20,7 +22,14 @@ import (
 func setupRouter() *gin.Engine {
 	router := gin.Default()
 
+	compress, err := ginCompressor.DefaultAdapter()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	router.Use(middlewares.SetContextDataMiddleware())
+
+	router.Use(compress)
 
 	router.LoadHTMLGlob("web/templates/*")
 
@@ -76,6 +85,10 @@ func renderTemplate(c *gin.Context, data routes.RouteData, ctxData middlewares.C
 }
 
 func main() {
+	// Parse command-line flags
+	useHTTPS := flag.Bool("https", false, "start HTTPS server")
+	flag.Parse()
+	
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -94,5 +107,32 @@ func main() {
 	}
 
 	r := setupRouter()
-	r.Run(":8080")
+
+	var addr string
+	var port string
+	var url string
+
+	if *useHTTPS {
+		addr = "coding-kittens.dev.com"
+		port = ":443"
+		url = addr
+		go func() {
+			if err := r.RunTLS(":443", "cert.pem", "key.pem"); err != nil {
+				log.Fatalf("Failed to start HTTPS server: %v", err)
+			}
+		}()
+	} else {
+		addr = "localhost"
+		port = ":8080"
+		url = addr + port
+		go func() {
+			if err := r.Run(":8080"); err != nil {
+				log.Fatalf("Failed to start HTTP server: %v", err)
+			}
+		}()
+	}
+
+	log.Printf("Server started on %s", url)
+
+	select {}
 }
