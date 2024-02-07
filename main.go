@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 
 	"coding-kittens.com/middlewares"
 	"coding-kittens.com/modules/image"
@@ -73,6 +74,18 @@ func renderTemplate(c *gin.Context, data routes.RouteData, ctxData middlewares.C
 
 	theme, err := c.Cookie("theme")
 
+	// Set Last-Modified header
+    lastModified := time.Now().UTC()
+    c.Header("Last-Modified", lastModified.Format(http.TimeFormat))
+
+    // Check If-Modified-Since header
+    if ims := c.GetHeader("If-Modified-Since"); ims != "" {
+        if t, err := time.Parse(http.TimeFormat, ims); err == nil && lastModified.Before(t.Add(1*time.Second)) {
+            c.Status(http.StatusNotModified)
+            return
+        }
+    }
+	
 	c.HTML(http.StatusOK, "root.tmpl", gin.H{
 		"LiveReloadEnabled": ctxData.LiveReloadEnabled,
 		"Title":             data.Title,
