@@ -50,7 +50,7 @@ RUN --mount=type=cache,target=/gomod-cache go mod download
 
 COPY . ./
 
-RUN --mount=type=cache,target=/go-cache go build -o /javiermt-blog
+RUN go build -o /javiermt-blog
 
 FROM debian:bookworm-slim
 

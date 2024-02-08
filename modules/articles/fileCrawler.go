@@ -1,7 +1,6 @@
 package articles
 
 import (
-	"os"
 	"path/filepath"
 	"time"
 )
@@ -19,7 +18,7 @@ func FileCrawler(dir string, path []string) <-chan FileInfo {
 	go func() {
 		defer close(fileInfoChan)
 
-		files, err := os.ReadDir(dir)
+		files, err := ArticlesFS.ReadDir(dir)
 		if err != nil {
 			return
 		}
@@ -31,7 +30,19 @@ func FileCrawler(dir string, path []string) <-chan FileInfo {
 				fileInfoChan <- <-FileCrawler(subDir, subPath)
 			} else {
 				filePath := filepath.Join(dir, file.Name())
-				fileInfo, err := os.Stat(filePath)
+				
+				f, err := ArticlesFS.Open(filePath)
+				if err != nil {
+					continue
+				}
+
+				defer f.Close()
+
+				fileInfo, err := f.Stat()
+				
+				if err != nil {
+					continue
+				}
 				if err != nil {
 					continue
 				}

@@ -3,7 +3,6 @@ package controllers
 import (
 	"bytes"
 	"fmt"
-	"os"
 	"time"
 
 	"coding-kittens.com/models"
@@ -29,7 +28,7 @@ func AboutController (c *gin.Context) map[string]interface{} {
 	for _, content := range latestContent {
 		var category string = content.Path[0];
 
-		file, err := os.ReadFile("./web/_articles/" + category + "/" + content.FileName)
+		file, err := ArticlesFS.ReadFile("web/_articles/" + category + "/" + content.FileName)
 		if err != nil {
 			fmt.Println("Error reading file:", err)
 		}

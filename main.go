@@ -13,7 +13,9 @@ import (
 	"strconv"
 	"time"
 
+	"coding-kittens.com/controllers"
 	"coding-kittens.com/middlewares"
+	"coding-kittens.com/modules/articles"
 	"coding-kittens.com/modules/image"
 	"coding-kittens.com/modules/livereload"
 	"coding-kittens.com/modules/utils"
@@ -27,6 +29,8 @@ import (
 var templateFiles embed.FS
 //go:embed all:web/static
 var staticAssets embed.FS
+//go:embed all:web/_articles
+var articlesFS embed.FS
 
 func mustFS() http.FileSystem {
 	sub, err := fs.Sub(staticAssets, "web/static")
@@ -122,6 +126,8 @@ func renderTemplate(c *gin.Context, data routes.RouteData, ctxData middlewares.C
 func main() {
 	utils.StaticAssets = staticAssets
 	image.StaticAssets = staticAssets
+	controllers.ArticlesFS = articlesFS
+	articles.ArticlesFS = articlesFS
 
 	// Parse command-line flags
 	useHTTPS := flag.Bool("https", false, "start HTTPS server")

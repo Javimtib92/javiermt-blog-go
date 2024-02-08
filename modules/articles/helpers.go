@@ -9,7 +9,7 @@ import (
 func GetAllArticles(query map[string]string) []FileInfo {
 	var articles []FileInfo
 
-	for fileInfo := range FileCrawler("./web/_articles", nil) {
+	for fileInfo := range FileCrawler("web/_articles", nil) {
 		category := fileInfo.Path[0]
 
 		if query["category"] != "" && query["category"] != category {
