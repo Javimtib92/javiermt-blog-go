@@ -3,8 +3,10 @@ package main
 import (
 	"bytes"
 	"context"
+	"embed"
 	"flag"
 	"html/template"
+	"io/fs"
 	"log"
 	"net/http"
 	"os"
@@ -14,11 +16,27 @@ import (
 	"coding-kittens.com/middlewares"
 	"coding-kittens.com/modules/image"
 	"coding-kittens.com/modules/livereload"
+	"coding-kittens.com/modules/utils"
 	"coding-kittens.com/routes"
 	ginCompressor "github.com/CAFxX/httpcompression/contrib/gin-gonic/gin"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
+
+//go:embed web/templates/*.tmpl
+var templateFiles embed.FS
+//go:embed all:web/static
+var staticAssets embed.FS
+
+func mustFS() http.FileSystem {
+	sub, err := fs.Sub(staticAssets, "web/static")
+
+	if err != nil {
+		panic(err)
+	}
+
+	return http.FS(sub)
+}
 
 func setupRouter() *gin.Engine {
 	router := gin.Default()
@@ -32,14 +50,18 @@ func setupRouter() *gin.Engine {
 
 	router.Use(compress)
 
-	router.LoadHTMLGlob("web/templates/*")
+    templateFS, err := template.ParseFS(templateFiles, "web/templates/*.tmpl")
+    if err != nil {
+        log.Fatal(err)
+    }
+    router.SetHTMLTemplate(templateFS)
 
 	for route, data := range routes.GetRoutes() {
 		router.GET(route, handleRoute(data))
 	}
 
 	router.GET("/image", image.ProcessImage)
-	router.StaticFS("/static", gin.Dir("./web/static", true))
+	router.StaticFS("/static", mustFS())
 	router.StaticFile("/favicon.ico", "./web/favicon.ico")
 
 	return router
@@ -54,7 +76,7 @@ func handleRoute(data routes.RouteData) gin.HandlerFunc {
 }
 
 func renderTemplate(c *gin.Context, data routes.RouteData, ctxData middlewares.ContextData) {
-	t := template.Must(template.New(data.Content).ParseGlob("./web/templates/*.tmpl"))
+	t := template.Must(template.New(data.Content).ParseFS(templateFiles, "web/templates/*.tmpl"))
 
 	var contentBuffer bytes.Buffer
 	var templateData map[string]interface{}
@@ -98,6 +120,9 @@ func renderTemplate(c *gin.Context, data routes.RouteData, ctxData middlewares.C
 }
 
 func main() {
+	utils.StaticAssets = staticAssets
+	image.StaticAssets = staticAssets
+
 	// Parse command-line flags
 	useHTTPS := flag.Bool("https", false, "start HTTPS server")
 	flag.Parse()
@@ -107,7 +132,7 @@ func main() {
 
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Print("Error loading .env file")
 	}
 
 	liveReloadEnabled, err := strconv.ParseBool(os.Getenv("LIVE_RELOAD_ENABLED"))

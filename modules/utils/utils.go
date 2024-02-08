@@ -1,16 +1,18 @@
 package utils
 
 import (
-	"os"
+	"embed"
 	"regexp"
 	"strings"
 )
 
-const CSS_PATH = "./web/styles.css"
+var StaticAssets embed.FS
+
+const CSS_PATH = "web/static/css/styles.css"
 
 func GetAccentBaseValue() string {
 	// Read the file synchronously
-	fileContent, err := os.ReadFile(CSS_PATH)
+	fileContent, err := StaticAssets.ReadFile(CSS_PATH)
 	if err != nil {
 		// Handle error, e.g., log or return an error value
 		return ""

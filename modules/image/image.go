@@ -1,6 +1,7 @@
 package image
 
 import (
+	"embed"
 	"fmt"
 	"path/filepath"
 	"regexp"
@@ -21,6 +22,7 @@ var imageCache = cache.NewFilesystemCache(cacheDir)
 
 var urlPattern = regexp.MustCompile(`^web/static/assets/[^\.]+\.(jpeg|jpg|png|gif|webp|avif)$`)
 
+var StaticAssets embed.FS
 
 func GenerateCacheKey(imageURL string, width, height int, mimeType string) string {
     parts := strings.Split(mimeType, "/")
@@ -30,6 +32,7 @@ func GenerateCacheKey(imageURL string, width, height int, mimeType string) strin
 
 var ImageTypeFromString = reverseMap(bimg.ImageTypes)
 
+
 func ProcessImage(c *gin.Context) {
 	imagePath := filepath.Join("./web/", c.Query("url"))
 
@@ -38,7 +41,7 @@ func ProcessImage(c *gin.Context) {
         return
     }
     
-    imageBytes, err := bimg.Read(imagePath)
+    imageBytes, err := StaticAssets.ReadFile(imagePath)
     if err != nil {
         c.JSON(400, gin.H{"error": "Failed to read the image"})
         return

@@ -7,5 +7,10 @@ dev:
 prod:
 	go run main.go -https
 
+docker-build:
+	docker build -t main .
 
-.PHONY: tailwind-build dev
+docker-run:
+	docker run --rm -p 8080:8080 -it main
+
+.PHONY: tailwind-build dev prod docker-build docker-run
