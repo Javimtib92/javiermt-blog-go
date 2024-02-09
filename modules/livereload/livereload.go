@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"sync"
@@ -43,8 +44,38 @@ func StartLiveReload(ctx context.Context) {
 	}
 	defer watcher.Close()
 
-	err = watcher.Add("./")
-	err = watcher.Add("./web/templates")
+	// List of directories to watch
+    directories := []string{
+        "./web",
+        "./modules",
+		"./controllers",
+		"./middlewares",
+		"./routes",
+        // Add more directories as needed
+    }
+
+    for _, dir := range directories {
+        err = filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			if info.IsDir() {
+				err = watcher.Add(path)
+				if err != nil {
+					log.Println("Error watching dir:", err)
+				}
+			}
+			return nil
+		})
+        if err != nil {
+            log.Println("Error watching parent dir:", err)
+        }
+    }
+
+	
+
+	log.Print(watcher.WatchList())
+
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -89,7 +120,7 @@ func StartLiveReload(ctx context.Context) {
 				if !ok {
 					return
 				}
-				log.Println("event:", event)
+
 				if event.Op&fsnotify.Write == fsnotify.Write {
 					ext := filepath.Ext(event.Name)
 
