@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html
   lang="en"
-  class="{{.THEME}}"
   x-data="theme"
   x-bind:class="{ 'dark': theme === 'dark' }"
   x-init="init"
@@ -27,62 +26,6 @@
     {{if .LiveReloadEnabled }}
     {{template "livereload"}}
     {{ end }}
-    <script>
-      document.addEventListener("htmx:beforeSwap", function (event) {
-        if (event.detail.target.id === "page") {
-          // Create a temporary element to hold the parsed HTML
-          const tempElement = document.createElement("html");
-          tempElement.innerHTML = event.detail.xhr.responseText;
-
-          // Get the head content from the temporary element
-          const metaTags = tempElement.querySelectorAll("meta");
-
-          // Remove existing meta tags from the current document's head
-          document.querySelectorAll("meta").forEach((tag) => tag.remove());
-
-          // Append the new meta tags to the current document's head
-          metaTags.forEach((metaTag) => {
-            document.querySelector("head").appendChild(metaTag.cloneNode(true));
-          });
-        }
-      });
-    </script>
-
-    <script>
-      function getCookie(name) {
-        const value = "; " + document.cookie;
-        const parts = value.split("; " + name + "=");
-        if (parts.length === 2) return parts.pop().split(";").shift();
-      }
-
-      function getPreferredTheme() {
-        return getCookie("theme") || (darkQuery.matches ? "dark" : "light");
-      }
-
-      document.addEventListener("alpine:init", () => {
-        Alpine.data("theme", () => {
-          const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
-
-          return {
-            theme: darkQuery.matches ? "dark" : "light",
-            toggleTheme() {
-              this.theme = this.theme === "light" ? "dark" : "light";
-              this.savePreferredTheme();
-            },
-            savePreferredTheme() {
-              document.cookie =
-                "theme=" +
-                this.theme +
-                "; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/; SameSite=Strict";
-            },
-            init() {
-              // Initialize the theme based on the preferred theme or default to 'light'
-              this.theme = getPreferredTheme();
-            },
-          };
-        });
-      });
-    </script>
     <script>
       if (!CSS.supports("animation-timeline: view()")) {
         const markElements = document.querySelectorAll("mark");

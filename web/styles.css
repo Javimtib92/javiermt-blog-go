@@ -45,6 +45,10 @@ p {
   text-wrap: pretty;
 }
 
+[x-cloak] {
+  visibility: hidden !important;
+}
+
 .prose {
   @apply mb-6 mt-6 text-base text-primary-800 dark:text-primary-200;
 }

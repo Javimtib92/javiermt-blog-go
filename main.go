@@ -98,8 +98,6 @@ func renderTemplate(c *gin.Context, data routes.RouteData, ctxData middlewares.C
 		return
 	}
 
-	theme, err := c.Cookie("theme")
-
 	// Set Last-Modified header
     lastModified := time.Now().UTC()
     c.Header("Last-Modified", lastModified.Format(http.TimeFormat))
@@ -118,7 +116,6 @@ func renderTemplate(c *gin.Context, data routes.RouteData, ctxData middlewares.C
 		"Description":       "change to some metadata description, can be overriden on route basis",
 		"Route":             c.Request.URL.Path,
 		"Template":          template.HTML(contentBuffer.String()),
-		"Theme":             theme,
 		"AccentHue":         ctxData.AccentBaseHSL.H,
 	})
 }

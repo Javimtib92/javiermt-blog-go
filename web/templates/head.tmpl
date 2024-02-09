@@ -50,5 +50,61 @@
   <link rel="stylesheet" href="/static/css/styles.css" />
   <script src="/static/js/htmx.js"></script>
   <script defer src="/static/js/alpine.js"></script>
+  <script>
+    document.addEventListener("htmx:beforeSwap", function (event) {
+      if (event.detail.target.id === "page") {
+        // Create a temporary element to hold the parsed HTML
+        const tempElement = document.createElement("html");
+        tempElement.innerHTML = event.detail.xhr.responseText;
+
+        // Get the head content from the temporary element
+        const metaTags = tempElement.querySelectorAll("meta");
+
+        // Remove existing meta tags from the current document's head
+        document.querySelectorAll("meta").forEach((tag) => tag.remove());
+
+        // Append the new meta tags to the current document's head
+        metaTags.forEach((metaTag) => {
+          document.querySelector("head").appendChild(metaTag.cloneNode(true));
+        });
+      }
+    });
+  </script>
+
+  <script>
+    function getPreferredTheme() {
+      const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
+
+      return (
+        window.localStorage.getItem("theme") ||
+        (darkQuery.matches ? "dark" : "light")
+      );
+    }
+
+    const theme = getPreferredTheme();
+
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+    }
+
+    document.addEventListener("alpine:init", () => {
+      Alpine.data("theme", () => {
+        return {
+          theme,
+          toggleTheme() {
+            this.theme = this.theme === "light" ? "dark" : "light";
+            this.savePreferredTheme();
+          },
+          savePreferredTheme() {
+            window.localStorage.setItem("theme", this.theme);
+          },
+          init() {
+            // Initialize the theme based on the preferred theme or default to 'light'
+            this.theme = getPreferredTheme();
+          },
+        };
+      });
+    });
+  </script>
 </head>
 {{ end }}
