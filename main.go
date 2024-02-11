@@ -10,7 +10,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strconv"
 	"time"
 
 	"coding-kittens.com/controllers"
@@ -22,7 +21,7 @@ import (
 	"coding-kittens.com/routes"
 	ginCompressor "github.com/CAFxX/httpcompression/contrib/gin-gonic/gin"
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
+	"github.com/gin-gonic/gin/render"
 )
 
 //go:embed web/templates/*.tmpl
@@ -32,118 +31,27 @@ var staticAssets embed.FS
 //go:embed all:web/_articles
 var articlesFS embed.FS
 
-func mustFS() http.FileSystem {
-	sub, err := fs.Sub(staticAssets, "web/static")
-
-	if err != nil {
-		panic(err)
-	}
-
-	return http.FS(sub)
-}
-
-func setupRouter() *gin.Engine {
-	router := gin.Default()
-
-	compress, err := ginCompressor.DefaultAdapter()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	router.Use(middlewares.SetContextDataMiddleware())
-
-	router.Use(compress)
-
-    templateFS, err := template.ParseFS(templateFiles, "web/templates/*.tmpl")
-    if err != nil {
-        log.Fatal(err)
-    }
-    router.SetHTMLTemplate(templateFS)
-
-	for route, data := range routes.GetRoutes() {
-		router.GET(route, handleRoute(data))
-	}
-
-	router.GET("/image", image.ProcessImage)
-	router.StaticFS("/static", mustFS())
-	router.StaticFile("/favicon.ico", "./web/favicon.ico")
-
-	return router
-}
-
-func handleRoute(data routes.RouteData) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		ctxData := c.MustGet("ContextData").(middlewares.ContextData)
-
-		renderTemplate(c, data, ctxData)
-	}
-}
-
-func renderTemplate(c *gin.Context, data routes.RouteData, ctxData middlewares.ContextData) {
-	t := template.Must(template.New(data.Content).ParseFS(templateFiles, "web/templates/*.tmpl"))
-
-	var contentBuffer bytes.Buffer
-	var templateData map[string]interface{}
-
-	if data.Controller != nil {
-		templateData = data.Controller(c)
-	} else {
-		templateData = make(map[string]interface{})
-	}
-
-	err := t.ExecuteTemplate(&contentBuffer, data.Content, templateData)
-
-	if err != nil {
-		c.AbortWithStatus(http.StatusNotFound)
-		return
-	}
-
-	// Set Last-Modified header
-    lastModified := time.Now().UTC()
-    c.Header("Last-Modified", lastModified.Format(http.TimeFormat))
-
-    // Check If-Modified-Since header
-    if ims := c.GetHeader("If-Modified-Since"); ims != "" {
-        if t, err := time.Parse(http.TimeFormat, ims); err == nil && lastModified.Before(t.Add(1*time.Second)) {
-            c.Status(http.StatusNotModified)
-            return
-        }
-    }
-	
-	c.HTML(http.StatusOK, "root.tmpl", gin.H{
-		"LiveReloadEnabled": ctxData.LiveReloadEnabled,
-		"Title":             data.Title,
-		"Description":       "change to some metadata description, can be overriden on route basis",
-		"Route":             c.Request.URL.Path,
-		"Template":          template.HTML(contentBuffer.String()),
-		"AccentHue":         ctxData.AccentBaseHSL.H,
-	})
-}
-
 func main() {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	utils.StaticAssets = staticAssets
 	image.StaticAssets = staticAssets
 	controllers.ArticlesFS = articlesFS
 	articles.ArticlesFS = articlesFS
 
-	// Parse command-line flags
 	useHTTPS := flag.Bool("https", false, "start HTTPS server")
-	flag.Parse()
-	
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	debug := flag.Bool("debug", false, "Enable debug mode")
 
-	err := godotenv.Load()
-	if err != nil {
-		log.Print("Error loading .env file")
-	}
+    flag.Parse()
 
-	liveReloadEnabled, err := strconv.ParseBool(os.Getenv("LIVE_RELOAD_ENABLED"))
-	if err != nil {
-		liveReloadEnabled = false
-	}
+    if *debug {
+        gin.SetMode(gin.DebugMode)
+    } else {
+        gin.SetMode(gin.ReleaseMode)
+    }
 
-	if liveReloadEnabled {
+	if gin.IsDebugging() {
 		go livereload.StartLiveReload(ctx)
 	}
 
@@ -176,4 +84,122 @@ func main() {
 	log.Printf("Server started on %s", url)
 
 	select {}
+}
+
+func setupRouter() *gin.Engine {
+	router := gin.Default()
+	
+	compress, err := ginCompressor.DefaultAdapter()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	router.Use(middlewares.SetContextDataMiddleware())
+
+	router.Use(compress)
+
+	loadTemplates(router)
+
+	for route, data := range routes.GetRoutes() {
+		router.GET(route, handleRoute(data, router))
+	}
+
+	router.GET("/image", image.ProcessImage)
+
+	router.StaticFS("/static", http.FS(loadFS(staticAssets, "web/static")))
+	router.StaticFile("/favicon.ico", "./web/favicon.ico")
+
+	return router
+}
+
+
+func loadTemplates(router *gin.Engine) error {
+    templateFS, err := template.ParseFS(loadFS(templateFiles, "web/templates"), "*.tmpl")
+
+    if err != nil {
+        return err
+    }
+
+    router.SetHTMLTemplate(templateFS)
+
+    return nil
+}
+
+func loadFS(embed embed.FS, dir string) fs.FS {
+	var fileSystem fs.FS
+
+	if gin.IsDebugging() {
+		fileSystem = os.DirFS(dir)
+	} else {
+		fileSystem, _ = fs.Sub(embed, dir)
+	}
+
+	return fileSystem
+}
+
+func handleRoute(data routes.RouteData, router *gin.Engine) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctxData := c.MustGet("ContextData").(middlewares.ContextData)
+
+		renderTemplate(c, data, ctxData)
+	}
+}
+
+func renderTemplate(c *gin.Context, data routes.RouteData, ctxData middlewares.ContextData) {
+	t := template.Must(template.New(data.Content).ParseFS(loadFS(templateFiles, "web/templates"), "*.tmpl"))
+
+	var contentBuffer bytes.Buffer
+	var templateData map[string]interface{}
+
+	if data.Controller != nil {
+		templateData = data.Controller(c)
+	} else {
+		templateData = make(map[string]interface{})
+	}
+
+	err := t.ExecuteTemplate(&contentBuffer, data.Content, templateData)
+
+	if err != nil {
+		c.AbortWithStatus(http.StatusNotFound)
+		return
+	}
+
+	// Set Last-Modified header
+    lastModified := time.Now().UTC()
+    c.Header("Last-Modified", lastModified.Format(http.TimeFormat))
+
+    // Check If-Modified-Since header
+    if ims := c.GetHeader("If-Modified-Since"); ims != "" {
+        if t, err := time.Parse(http.TimeFormat, ims); err == nil && lastModified.Before(t.Add(1*time.Second)) {
+            c.Status(http.StatusNotModified)
+            return
+        }
+    }
+
+	var rootContentBuffer bytes.Buffer
+
+	template.Must(template.New("root.tmpl").ParseFS(loadFS(templateFiles, "web/templates"), "root.tmpl"))
+
+	renderData := struct {
+        LiveReloadEnabled bool
+        Title             string
+        Description       string
+        Route             string
+        Template          template.HTML
+        AccentHue         float64
+    }{
+        LiveReloadEnabled: ctxData.LiveReloadEnabled,
+        Title:             data.Title,
+        Description:       "change to some metadata description, can be overriden on route basis",
+        Route:             c.Request.URL.Path,
+        Template:          template.HTML(contentBuffer.String()),
+        AccentHue:         ctxData.AccentBaseHSL.H,
+    }
+
+	err = t.ExecuteTemplate(&rootContentBuffer, "root.tmpl", renderData)
+
+	c.Render(http.StatusOK, render.Data{
+		ContentType: "text/html",
+		Data:        rootContentBuffer.Bytes(),
+	})
 }

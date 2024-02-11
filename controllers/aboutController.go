@@ -29,6 +29,7 @@ func AboutController (c *gin.Context) map[string]interface{} {
 		var category string = content.Path[0];
 
 		file, err := ArticlesFS.ReadFile("web/_articles/" + category + "/" + content.FileName)
+		
 		if err != nil {
 			fmt.Println("Error reading file:", err)
 		}
