@@ -1348,6 +1348,11 @@ video {
   color: rgb(0 0 0 / var(--tw-text-opacity));
 }
 
+.text-neutral-500 {
+  --tw-text-opacity: 1;
+  color: rgb(115 115 115 / var(--tw-text-opacity));
+}
+
 .text-neutral-700 {
   --tw-text-opacity: 1;
   color: rgb(64 64 64 / var(--tw-text-opacity));
@@ -1959,6 +1964,11 @@ a {
   color: color-mix(in srgb, var(--color-accent-base) 70%, white);
 }
 
+.hover\:text-neutral-800:hover {
+  --tw-text-opacity: 1;
+  color: rgb(38 38 38 / var(--tw-text-opacity));
+}
+
 .group:hover .group-hover\:-rotate-12 {
   --tw-rotate: -12deg;
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
@@ -2034,6 +2044,11 @@ a {
 
 :is(.dark .dark\:hover\:text-accent-300:hover) {
   color: color-mix(in srgb, var(--color-accent-base) 50%, white);
+}
+
+:is(.dark .dark\:hover\:text-neutral-200:hover) {
+  --tw-text-opacity: 1;
+  color: rgb(229 229 229 / var(--tw-text-opacity));
 }
 
 @media (min-width: 640px) {

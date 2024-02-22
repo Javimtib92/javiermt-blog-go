@@ -72,6 +72,21 @@
   </script>
 
   <script>
+    document.addEventListener("alpine:init", () => {
+      Alpine.data("route", () => {
+        return {
+          route: "",
+          changeRoute(route) {
+            this.route = route;
+          },
+          init() {
+            this.route = "{{.Route}}";
+          },
+        };
+      });
+    });
+  </script>
+  <script>
     function getPreferredTheme() {
       const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
 

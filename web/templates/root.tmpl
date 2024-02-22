@@ -14,7 +14,7 @@
       <main class="flex min-w-0 flex-auto flex-col px-2 md:px-0">
         {{template "nav" .}}
 
-        <div id="page" hx-swap-oob="true">
+        <div id="page" hx-swap-oob="true" hx-history="false">
           {{ .Template }}
         </div>
       </main>

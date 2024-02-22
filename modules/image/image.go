@@ -3,6 +3,7 @@ package image
 import (
 	"embed"
 	"fmt"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -29,9 +30,6 @@ func GenerateCacheKey(imageURL string, width, height int, mimeType string) strin
 
     return fmt.Sprintf("%s_%d_%d.%s", imageURL, width, height, parts[1])
 }
-
-var ImageTypeFromString = reverseMap(bimg.ImageTypes)
-
 
 func ProcessImage(c *gin.Context) {
 	imagePath := filepath.Join("./web/", c.Query("url"))
@@ -80,9 +78,10 @@ func ProcessImage(c *gin.Context) {
         c.JSON(400, gin.H{"error": "Invalid quality"})
         return
     }
-
-    options := []string{"image/avif", "image/webp", "image/jpeg", "image/png", "image/gif"}
+    // TODO: add image/avif when it's supported
+    options := []string{"image/webp", "image/jpeg", "image/png", "image/gif"}
     mimeType := getSupportedMimeType(options, c)
+
     if mimeType == "" {
         c.JSON(400, gin.H{"error": "No supported MIME type found"})
         return
@@ -95,23 +94,25 @@ func ProcessImage(c *gin.Context) {
         return
     }
 
-    resizedImage, err := bimg.Resize(imageBytes, bimg.Options{
+    image, err := bimg.NewImage(imageBytes).Convert(getImageTypeFromString(mimeType))
+    if err != nil {
+        c.JSON(400, gin.H{"error": "Failed to convert the image to the proper MIME type"})
+        return
+    }
+
+    if bimg.NewImage(image).Type() == "png" {
+        fmt.Fprintln(os.Stderr, "The image was converted into png")
+      }
+
+    resizedImage, err := bimg.Resize(image, bimg.Options{
         Width:  width,
         Height: height,
 		Quality: quality,
     })
+
     if err != nil {
         c.JSON(400, gin.H{"error": "Failed to resize the image"})
         return
-    }
-
-    if !strings.Contains(mimeType, "image/") {
-        img, err := bimg.NewImage(imageBytes).Convert(getImageTypeFromString(mimeType))
-        if err != nil {
-            c.JSON(400, gin.H{"error": "Failed to convert the image to the proper MIME type"})
-            return
-        }
-        imageBytes = img
     }
 
     imageCache.Set(cacheKey, resizedImage, mimeType, 7 * 24 * time.Hour)
@@ -119,26 +120,29 @@ func ProcessImage(c *gin.Context) {
     c.Data(200, mimeType, resizedImage)
 }
 
-func reverseMap(originalMap map[bimg.ImageType]string) map[string]bimg.ImageType {
-    reversedMap := make(map[string]bimg.ImageType)
-
-    for key, value := range originalMap {
-        reversedMap[value] = key
-    }
-
-    return reversedMap
-}
-
 func getImageTypeFromString(mimeType string) bimg.ImageType {
-    if imageType, ok := ImageTypeFromString[mimeType]; ok {
-        return imageType
-    }
-    // If the MIME type is not recognized, return a default value or handle the error
-    return bimg.JPEG
+    mimeType = strings.TrimPrefix(mimeType, "image/")
+
+    for imageType, typeName := range bimg.ImageTypes {
+		if typeName == mimeType {
+			return imageType
+		}
+	}
+	// If the MIME type is not recognized, return a default value or handle the error
+	return bimg.JPEG
 }
 
 func getSupportedMimeType(options []string, c *gin.Context) string {
 	accept := c.GetHeader("Accept")
+    mimeTypeQueryParam := c.Query("mimeType")
+
+    if mimeTypeQueryParam != "" {
+        for _, option := range options {
+            if strings.Contains(mimeTypeQueryParam, option) {
+                return option
+            }
+        }
+    } 
 
 	mimeType := mediaType(accept, options)
 
@@ -163,14 +167,4 @@ func mediaType(accept string, options []string) string {
 	}
 
 	return options[0]
-}
-
-func atoi(s string) int {
-    i, _ := strconv.Atoi(s)
-    return i
-}
-
-func itoa(i int) string {
-	s := strconv.Itoa(i)
-	return s
 }

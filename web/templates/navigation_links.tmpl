@@ -3,11 +3,22 @@
   class="hidden flex-row items-center sm:flex"
   hx-boost="true"
   hx-target="#page"
+  x-data="route"
 >
-  <a href="/" class="flex align-middle transition-all">
+  <a
+    href="/"
+    class="flex align-middle transition-all"
+    x-on:click="changeRoute('/')"
+    x-bind:class="route === '/' ? 'dark:text-white text-neutral-900 underline underline-offset-8' : 'text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200'"
+  >
     <span class="relative px-2 py-1">Me</span>
   </a>
-  <a href="/blog" class="flex align-middle transition-all">
+  <a
+    href="/blog"
+    class="flex align-middle transition-all"
+    x-on:click="changeRoute('/blog')"
+    x-bind:class="route === '/blog' ? 'dark:text-white text-neutral-900 underline underline-offset-8' : 'text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200'"
+  >
     <span class="relative px-2 py-1">Blog</span>
   </a>
 </div>
